@@ -118,3 +118,17 @@ brfss %>%
 
 ```
 
+
+#### Pokemon Data
+
+```{r}
+
+pokemon = 
+  GET("https://pokeapi.co/api/v2/pokemon/ditto") %>%
+  content()
+
+pokemon$height
+pokemon$abilities
+
+```
+
