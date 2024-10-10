@@ -14,6 +14,10 @@ library(httr)
 
 The `rvest` and `httr` packages are required to harvest data from the web.
 
+## Scraping Web Data
+
+#### Marijuana Use
+
 ```{r}
 
 url = "https://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
@@ -21,8 +25,6 @@ url = "https://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2
 drug_use_html = read_html(url)
 
 ```
-
-#### Marijuana Use
 
 ```{r}
 
@@ -41,11 +43,78 @@ marj_use_df
 ```{r}
 
 url_nyc = "https://www.bestplaces.net/cost_of_living/city/new_york/new_york"
-
 nyc_html = read_html(url_nyc)
 
-nyc_df =
+nyc_df = nyc_html %>%
+  html_table(header = TRUE) %>%
+  first()
+
+nyc_df
   
+
+```
+
+## CSS Selectors
+
+#### Star Wars Movies
+
+```{r}
+
+swm_html = read_html("https://www.imdb.com/list/ls070150896/")
+
+```
+
+```{r}
+
+title_vec = 
+  swm_html |>
+  html_elements(".ipc-title-link-wrapper .ipc-title__text") |>
+  html_text()
+
+metascore_vec = 
+  swm_html |>
+  html_elements(".metacritic-score-box") |>
+  html_text()
+
+runtime_vec = 
+  swm_html |>
+  html_elements(".dli-title-metadata-item:nth-child(2)") |>
+  html_text()
+
+swm_df = 
+  tibble(
+    title = title_vec,
+    score = metascore_vec,
+    runtime = runtime_vec)
+
+swm_df
+
+```
+
+## Using an API
+
+#### NYC Water Consumption Data
+
+```{r}
+
+nyc_water = GET("https://data.cityofnewyork.us/resource/ia2d-e54m.csv")
+
+nyc_water %>%
+  content()
+
+```
+
+#### BRFSS Data
+
+Choose CSV as the download format when you click the API link. You can use the `query` parameter in the `GET` function to extend the number of rows of data you can mine (the default number of rows is 1000).
+
+```{r}
+
+brfss = GET("https://chronicdata.cdc.gov/resource/acme-vg9e.csv",
+            query = list("$limit" = 5000))
+
+brfss %>%
+  content()
 
 ```
 
